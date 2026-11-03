@@ -1,0 +1,4 @@
+<%@ include file="header.jspf" %><h1>My Activity</h1><p>Recent actions involving your account and files you own or receive. Times use UTC.</p>
+<c:choose><c:when test="${empty logs}"><section><p>No activity found.</p></section></c:when><c:otherwise><section class="table-wrap"><table><thead><tr><th>Time (UTC)</th><th>Actor</th><th>Action</th><th>Outcome</th><th>Reason</th></tr></thead><tbody>
+<c:forEach var="log" items="${logs}"><tr><td><c:out value="${log.occurredAt}"/></td><td><c:out value="${log.actor}"/></td><td><c:out value="${log.action}"/></td><td><c:out value="${log.outcome}"/></td><td><c:out value="${log.reason}"/></td></tr></c:forEach></tbody></table></section></c:otherwise></c:choose>
+<c:set var="hasNext" value="${logs.size() eq 20}"/><%@ include file="pagination.jspf" %><%@ include file="footer.jspf" %>

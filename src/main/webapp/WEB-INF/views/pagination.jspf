@@ -1,0 +1,5 @@
+<nav class="pagination" aria-label="Pages">
+<c:if test="${page gt 0}"><c:url var="previous" value=""><c:param name="page" value="${page-1}"/><c:param name="q" value="${param.q}"/></c:url><a href="<c:out value='${previous}'/>">Previous</a></c:if>
+<span>Page <c:out value="${page+1}" /></span>
+<c:if test="${hasNext}"><c:url var="next" value=""><c:param name="page" value="${page+1}"/><c:param name="q" value="${param.q}"/></c:url><a href="<c:out value='${next}'/>">Next</a></c:if>
+</nav>

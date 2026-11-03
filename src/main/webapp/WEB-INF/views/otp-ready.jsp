@@ -1,0 +1,3 @@
+<%@ include file="header.jspf" %>
+<h1>Verification Complete</h1><section><p>Start the authorized operation within two minutes. This authorization can be used once.</p><form method="post" action="${pageContext.request.contextPath}${ready.operation eq 'VIEW' ? '/viewer/open' : '/transfer'}"><%@ include file="csrf.jspf" %><input type="hidden" name="id" value="${ready.fileId}"><input type="hidden" name="permit" value="${ready.token}"><input type="hidden" name="initiation" value="${initiation}"><button><c:out value="${ready.operation eq 'VIEW' ? 'Open Viewer' : 'Start Download'}"/></button></form></section>
+<%@ include file="footer.jspf" %>

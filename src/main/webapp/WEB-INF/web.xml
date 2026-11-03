@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd" version="6.0">
+  <display-name>Secure File Sharing</display-name>
+  <context-param><param-name>jakarta.faces.PROJECT_STAGE</param-name><param-value>Production</param-value></context-param>
+  <context-param><param-name>jakarta.faces.FACELETS_SKIP_COMMENTS</param-name><param-value>true</param-value></context-param>
+  <listener><listener-class>org.jboss.weld.environment.servlet.Listener</listener-class></listener>
+  <listener><listener-class>com.securefiles.config.AppContext</listener-class></listener>
+  <filter><filter-name>security</filter-name><filter-class>com.securefiles.filter.SecurityFilter</filter-class></filter>
+  <filter-mapping><filter-name>security</filter-name><url-pattern>/*</url-pattern><dispatcher>REQUEST</dispatcher></filter-mapping>
+  <servlet><servlet-name>user</servlet-name><servlet-class>com.securefiles.controller.UserController</servlet-class><multipart-config><max-file-size>10485760</max-file-size><max-request-size>11534336</max-request-size><file-size-threshold>11534336</file-size-threshold></multipart-config></servlet>
+  <servlet-mapping><servlet-name>user</servlet-name><url-pattern>/</url-pattern></servlet-mapping>
+  <servlet><servlet-name>assets</servlet-name><servlet-class>org.apache.catalina.servlets.DefaultServlet</servlet-class><init-param><param-name>listings</param-name><param-value>false</param-value></init-param></servlet>
+  <servlet-mapping><servlet-name>assets</servlet-name><url-pattern>/assets/*</url-pattern></servlet-mapping>
+  <servlet><servlet-name>Faces Servlet</servlet-name><servlet-class>jakarta.faces.webapp.FacesServlet</servlet-class><load-on-startup>1</load-on-startup></servlet>
+  <servlet-mapping><servlet-name>Faces Servlet</servlet-name><url-pattern>*.xhtml</url-pattern></servlet-mapping>
+  <session-config><session-timeout>20</session-timeout><cookie-config><http-only>true</http-only></cookie-config><tracking-mode>COOKIE</tracking-mode></session-config>
+  <error-page><error-code>404</error-code><location>/WEB-INF/views/error.jsp</location></error-page>
+  <error-page><error-code>403</error-code><location>/WEB-INF/views/error.jsp</location></error-page>
+  <error-page><error-code>500</error-code><location>/WEB-INF/views/error.jsp</location></error-page>
+  <error-page><exception-type>java.lang.Throwable</exception-type><location>/WEB-INF/views/error.jsp</location></error-page>
+</web-app>
