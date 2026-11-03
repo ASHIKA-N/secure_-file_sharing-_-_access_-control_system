@@ -1,6 +1,6 @@
 # Current advanced-feature verification
 
-The final advanced build ran `mvn clean verify` successfully with **47 tests passed, zero failures, zero errors and zero skipped**. This supersedes the historical 21-test base-application results below.
+The final advanced build ran `mvn clean verify` successfully with **49 tests passed, zero failures, zero errors and zero skipped**. This supersedes the historical 21-test base-application results below.
 
 | Class | Tests | Result |
 |---|---:|---|
@@ -8,12 +8,14 @@ The final advanced build ran `mvn clean verify` successfully with **47 tests pas
 | AccessPolicyTest | 2 | Passed |
 | DocumentRendererTest | 2 | Passed |
 | ServiceIT | 10 | Passed |
-| AdvancedIT | 20 | Passed |
-| WebIT | 7 | Passed |
+| AdvancedIT | 21 | Passed |
+| WebIT | 8 | Passed |
 
 The focused checks include exact expiry and daily/overnight/DST boundaries; disabled/exhausted downloads; concurrent final transfers and view reservations; refresh, duplicate initiation, closure and expiry; viewer revocation; shared ancestor budgets, cycle/depth/expiry/version restrictions; catalogue privacy and request transitions; OTP wrong attempts, cooldown, expiry, binding, replay and delivery failure; personalized PDF identity on every page, original preservation, unsupported signed/encrypted/malformed PDFs and small-image viewer watermarks; version pinning/counter preservation; alert thresholds/deduplication/privacy; concurrent audit appends and alteration/reordering/truncation/checkpoint-tampering detection. Web tests exercise actual JSP policy confirmation, OTP/viewer/request routes, Faces audit verification and missing/invalid CSRF protections.
 
 Generated evidence: `target/surefire-reports`, `target/failsafe-reports` and ignored `.tools/advanced-final-verify.log`. The isolated database is H2 in Oracle compatibility mode, not a replacement for Oracle verification.
+
+The recipient visibility regression also passed: closed-hour shares remain listed, content is still denied until its allowed window, OTP is still required, and the reported request/notification routes return successful responses. See [the fix notes](share-visibility-fix.md). Current build evidence is .tools/share-visibility-fix-verify.log.
 
 ## Actual Oracle 21.3 web verification
 

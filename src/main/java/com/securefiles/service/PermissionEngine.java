@@ -99,8 +99,19 @@ public final class PermissionEngine {
             || !p.grantedBy.isActive()
             || p.expiresAt != null && !clock.instant().isBefore(p.expiresAt))
           throw AppException.unavailable();
-        if (!AccessPolicy.inWindow(clock.instant(), p.windowStart, p.windowEnd, p.windowZone))
-          throw new AppException(403, "Access is outside the hours set by the file owner.");
+        // Listing an existing share is metadata access; content still enforces every window.
+        if (!action.equals("LIST")
+            && !AccessPolicy.inWindow(clock.instant(), p.windowStart, p.windowEnd, p.windowZone))
+          throw new AppException(
+              403,
+              String.format(
+                  "Access is outside the allowed hours: %02d:%02d–%02d:%02d %s. Check the named"
+                      + " timezone with the file owner.",
+                  p.windowStart / 60,
+                  p.windowStart % 60,
+                  p.windowEnd / 60,
+                  p.windowEnd % 60,
+                  p.windowZone));
         if (i + 1 < chain.size()) {
           FilePermission parent = chain.get(i + 1);
           if (!parent.reshareAllowed || !p.grantedBy.getId().equals(parent.recipient.getId()))

@@ -175,6 +175,27 @@ public final class AdvancedService {
     map.put("classification", a.file().classification);
     map.put("owner", a.file().owner.getName());
     map.put("otp", a.otp());
+    map.put(
+        "accessOpen",
+        a.chain().stream()
+            .allMatch(
+                p ->
+                    AccessPolicy.inWindow(
+                        clock.instant(), p.windowStart, p.windowEnd, p.windowZone)));
+    map.put(
+        "accessHours",
+        a.chain().stream()
+            .filter(p -> p.windowStart != null)
+            .map(
+                p ->
+                    String.format(
+                        "%02d:%02d–%02d:%02d %s",
+                        p.windowStart / 60,
+                        p.windowStart % 60,
+                        p.windowEnd / 60,
+                        p.windowEnd % 60,
+                        p.windowZone))
+            .collect(java.util.stream.Collectors.joining(" AND ")));
     map.put("viewAllowed", a.chain().stream().allMatch(p -> p.viewAllowed));
     map.put("downloadAllowed", a.chain().stream().allMatch(p -> p.downloadAllowed));
     map.put("reshareAllowed", a.chain().stream().allMatch(p -> p.reshareAllowed));
@@ -199,16 +220,20 @@ public final class AdvancedService {
           List<Map<String, Object>> result = new ArrayList<>();
           for (FilePermission p :
               s.createQuery(
-                      "from FilePermission p where p.recipient.id=:actor and (:q is null or"
-                          + " locate(:q,lower(p.file.originalName))>0) order by p.grantedAt desc",
+                      "from FilePermission p where p.recipient.id=:actor and p.revokedAt is null"
+                          + " and (p.expiresAt is null or p.expiresAt>:now) and"
+                          + " p.file.status='ACTIVE' and p.file.owner.active=true and (:q is null"
+                          + " or locate(:q,lower(p.file.originalName))>0) order by p.grantedAt"
+                          + " desc",
                       FilePermission.class)
                   .setParameter("actor", actor)
+                  .setParameter("now", clock.instant())
                   .setParameter("q", q)
                   .setFirstResult(offset(page))
                   .setMaxResults(20)
                   .list())
             try {
-              Access a = permissions.resolve(s, actor, p.file.getId(), "INFO", null, false, false);
+              Access a = permissions.resolve(s, actor, p.file.getId(), "LIST", null, false, false);
               Map<String, Object> m = info(a);
               m.put("description", a.file().description == null ? "" : a.file().description);
               m.put("size", a.content().size);

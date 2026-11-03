@@ -18,6 +18,31 @@ import org.junit.jupiter.api.io.TempDir;
 
 class AdvancedIT {
   @Test
+  void scheduledShareIsListedWhileContentStillRequiresHoursAndOtp() {
+    advanced.share(
+        anu,
+        file,
+        "bala@test.example",
+        new AccessPolicy(true, 2, true, 2, false, null, 13 * 60, 14 * 60, "UTC", true, null),
+        null);
+    var rows = app.files(bala, "", 0, true);
+    assertEquals(1, rows.size());
+    assertEquals(false, rows.get(0).get("accessOpen"));
+    assertEquals("13:00–14:00 UTC", rows.get(0).get("accessHours"));
+    assertEquals(403, assertThrows(AppException.class, () -> app.download(bala, file)).status);
+    assertEquals(0, downloads(bala));
+    clock.now = Instant.parse("2026-11-02T13:00:00Z");
+    rows = app.files(bala, "", 0, true);
+    assertEquals(true, rows.get(0).get("accessOpen"));
+    assertEquals(true, rows.get(0).get("otp"));
+    assertEquals(428, assertThrows(AppException.class, () -> app.download(bala, file)).status);
+    String challenge = advanced.startOtp(bala, file, "DOWNLOAD");
+    String permit = advanced.verifyOtp(bala, challenge, code(challenge));
+    assertNotNull(advanced.download(bala, file, permit, false));
+    assertEquals(1, downloads(bala));
+  }
+
+  @Test
   void concurrentAuditAppendsRemainVerifiable() throws Exception {
     var workers = Executors.newFixedThreadPool(4);
     try {

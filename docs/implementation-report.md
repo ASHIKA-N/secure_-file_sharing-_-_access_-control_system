@@ -1,3 +1,5 @@
+Recipient visibility correction: scheduled grants now remain visible outside their access hours, with clear timezone and OTP status. All content checks remain enforced. [Details](share-visibility-fix.md). The clean build passed 49 tests.
+
 # Advanced feature implementation report
 
 The advanced-feature specification was integrated into the existing Oracle 21c application. The original stack, accounts, encrypted files, JSP/Faces split, and one-command launcher were retained.
@@ -22,7 +24,7 @@ The advanced-feature specification was integrated into the existing Oracle 21c a
 
 ## Actual verification
 
-The final `mvn clean verify` completed successfully: 47 tests passed with zero failures, errors or skipped tests. The expanded automated suite and Oracle-backed web checks are recorded in test-cases.md. Live Oracle checks passed the complete confidential-PDF request/approval/OTP/view-once flow, counted personalized PDF downloads, three-level shared-budget delegation, version pinning/archiving, alerts, Faces acknowledgement and protected audit verification/checkpoint export.
+The final `mvn clean verify` completed successfully: 49 tests passed with zero failures, errors or skipped tests. The expanded automated suite and Oracle-backed web checks are recorded in test-cases.md. Live Oracle checks passed the complete confidential-PDF request/approval/OTP/view-once flow, counted personalized PDF downloads, three-level shared-budget delegation, version pinning/archiving, alerts, Faces acknowledgement and protected audit verification/checkpoint export.
 
 Before V002, original file/grant/audit metadata was preserved in dedicated backup tables. Post-migration checks found zero missing original files/grants and zero altered original audit fields. Both original file rows received preserved version records using their existing storage IDs/wrapped keys. The original master key and database password were confirmed unchanged without printing them. Existing accounts were retained. Clearly labelled live-test accounts/audit records remain; temporary test files were deleted through the application.
 

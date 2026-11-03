@@ -1,4 +1,4 @@
-param([switch]$SetupOnly, [int]$Port = 8080)
+param([switch]$SetupOnly, [ValidateRange(1,65535)][int]$Port = 8080)
 $ErrorActionPreference = 'Stop'
 if ($env:OS -ne 'Windows_NT') { throw 'This launcher uses Windows DPAPI and local Oracle OS authentication.' }
 $projectRoot = Split-Path -Parent $PSScriptRoot

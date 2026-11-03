@@ -21,6 +21,56 @@ import org.junit.jupiter.api.io.TempDir;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class WebIT {
   @Test
+  void scheduledShareIsVisibleAndOtpDownloadActionIsExplicit() throws Exception {
+    String id =
+        service.upload(owner, "scheduled-share.txt", "scheduled recipient content".getBytes(), "");
+    var now = java.time.LocalTime.now(java.time.ZoneOffset.UTC);
+    int minute = now.getHour() * 60 + now.getMinute();
+    service
+        .advanced()
+        .share(
+            owner,
+            id,
+            "recipient@example.test",
+            new com.securefiles.security.AccessPolicy(
+                true,
+                2,
+                true,
+                2,
+                false,
+                null,
+                (minute + 60) % 1440,
+                (minute + 120) % 1440,
+                "UTC",
+                true,
+                null),
+            null);
+    HttpClient recipientClient = login("recipient@example.test");
+    var listing = get(recipientClient, "/shared");
+    assertEquals(200, listing.statusCode(), listing.body());
+    assertTrue(listing.body().contains("scheduled-share.txt"));
+    assertTrue(listing.body().contains("Outside allowed hours"));
+    assertEquals(
+        403,
+        post(recipientClient, "/transfer", Map.of("csrf", csrf(listing.body()), "id", id), false)
+            .statusCode());
+    service
+        .advanced()
+        .share(
+            owner,
+            id,
+            "recipient@example.test",
+            new com.securefiles.security.AccessPolicy(
+                true, 2, true, 2, false, null, null, null, null, true, null),
+            null);
+    listing = get(recipientClient, "/shared");
+    assertTrue(listing.body().contains("Verify OTP to Download"));
+    assertTrue(listing.body().contains("OTP verification required"));
+    for (String path : List.of("/catalogue", "/requests", "/received-requests", "/notifications"))
+      assertEquals(200, get(recipientClient, path).statusCode(), path);
+  }
+
+  @Test
   void advancedJspPolicyOtpViewerAndRequests() throws Exception {
     String id = service.upload(owner, "advanced.txt", "Advanced web content".getBytes(), "");
     HttpClient ownerClient = login("owner@example.test"),
